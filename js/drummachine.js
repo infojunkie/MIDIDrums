@@ -934,7 +934,8 @@ function setEffect(index) {
     convolver.disconnect();
     convolver = context.createConvolver();
     convolver.connect(effectLevelNode);
-    convolver.buffer = impulseResponseList[index].buffer;
+    if (index > 0)
+        convolver.buffer = impulseResponseList[index].buffer;
 
   // Hack - if the effect is meant to be entirely wet (not unprocessed signal)
   // then put the effect level all the way up.
