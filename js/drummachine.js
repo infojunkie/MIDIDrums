@@ -931,6 +931,9 @@ function setEffect(index) {
     theBeat.effectIndex = index;
     effectDryMix = impulseResponseInfoList[index].dryMix;
     effectWetMix = impulseResponseInfoList[index].wetMix;
+    convolver.disconnect();
+    convolver = context.createConvolver();
+    convolver.connect(effectLevelNode);
     convolver.buffer = impulseResponseList[index].buffer;
 
   // Hack - if the effect is meant to be entirely wet (not unprocessed signal)
