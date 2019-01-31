@@ -79,14 +79,15 @@ function changeMIDIOut( ev ) {
     midiOut = midiAccess.outputs()[ev.target.selectedIndex];
   else
     midiOut = midiAccess.outputs.get(id);
-
-  outputIsLivid = midiOut.name.indexOf("Controls") != -1;
-  if (outputIsLivid) {
-    updateActiveInstruments();
-    // light up the play button
-    midiOut.send( [0x90, 3, 32] );
-    // turn off the stop button
-    midiOut.send( [0x80, 7, 1] );
+  if (midiOut) {
+    outputIsLivid = midiOut.name.indexOf("Controls") != -1;
+    if (outputIsLivid) {
+      updateActiveInstruments();
+      // light up the play button
+      midiOut.send( [0x90, 3, 32] );
+      // turn off the stop button
+      midiOut.send( [0x80, 7, 1] );
+    }
   }
 }
 
@@ -94,10 +95,10 @@ function onMIDIInit( midi ) {
   midiAccess = midi;
   selectMIDIIn=document.getElementById("midiIn");
   selectMIDIOut=document.getElementById("midiOut");
-  
+
   // clear the MIDI input select
-  selectMIDIIn.options.length = 0;
-  selectMIDIOut.options.length = 0;
+//  selectMIDIIn.options.length = 0;
+//  selectMIDIOut.options.length = 0;
 
   if ((typeof(midiAccess.inputs) == "function")) {  //Old Skool MIDI inputs() code
     var list=midiAccess.inputs();
@@ -110,8 +111,10 @@ function onMIDIInit( midi ) {
       } else
         selectMIDIIn.appendChild(new Option(list[i].name,list[i].id,false,false));
     }
+    /*
     if (!midiIn)
       midiIn = list[0];
+    */
     if (midiIn)
       midiIn.onmidimessage = midiMessageReceived;
 
@@ -125,8 +128,10 @@ function onMIDIInit( midi ) {
       } else
         selectMIDIOut.appendChild(new Option(list[i].name,list[i].id,false,false));
     }
+    /*
     if (!midiOut)
       midiOut = list[0];
+    */
   } else {  // new MIDIMap implementation:
     var inputs=midiAccess.inputs.values();
     for ( var input = inputs.next(); input && !input.done; input = inputs.next()) {
@@ -140,11 +145,13 @@ function onMIDIInit( midi ) {
         midiIn.onmidimessage = midiMessageReceived;
       }
     }
+    /*
     if (!midiIn) {
       midiIn = midiAccess.inputs.values().next().value;
       if (midiIn)
         midiIn.onmidimessage = midiMessageReceived;
     }
+    */
 
     var outputs=midiAccess.outputs.values();
     for ( var output = outputs.next(); output && !output.done; output = outputs.next()) {
@@ -158,12 +165,14 @@ function onMIDIInit( midi ) {
         outputIsLivid = true;
       }
     }
+    /*
     if (!midiOut)
       midiOut = midiAccess.outputs.values().next().value;
+    */
   }
   selectMIDIIn.onchange = changeMIDIIn;
   selectMIDIOut.onchange = changeMIDIOut;
-  
+
   setActiveInstrument( 0 );
   updateActiveInstruments();
 
@@ -190,7 +199,7 @@ function onMIDISystemError( msg ) {
   console.log( "Error encountered:" + msg );
 }
 //init: start up MIDI
-window.addEventListener('load', function() {   
+window.addEventListener('load', function() {
   navigator.requestMIDIAccess().then( onMIDIInit, onMIDISystemError );
 });
 
@@ -281,7 +290,7 @@ function toggleBeat(rhythmIndex) {
 
 /* // not sure if we want to play notes when toggling on MIDI device
     var note = notes[rhythmIndex];
-    
+
     if (note) {
         switch(instrumentIndex) {
         case 0:  // Kick
@@ -297,15 +306,15 @@ function toggleBeat(rhythmIndex) {
           playNote(currentKit.hihatBuffer, true, 0.5*rhythmIndex - 4, 0, -1.0, theBeat.effectMix, volumes[note] * 0.7, hihatPitch, 0);
           break;
 
-        case 3:  // Tom 1   
+        case 3:  // Tom 1
           playNote(currentKit.tom1, false, 0,0,-2, theBeat.effectMix, volumes[note] * 0.6, tom1Pitch, 0);
           break;
 
-        case 4:  // Tom 2   
+        case 4:  // Tom 2
           playNote(currentKit.tom2, false, 0,0,-2, theBeat.effectMix, volumes[note] * 0.6, tom2Pitch, 0);
           break;
 
-        case 5:  // Tom 3   
+        case 5:  // Tom 3
           playNote(currentKit.tom3, false, 0,0,-2, theBeat.effectMix, volumes[note] * 0.6, tom3Pitch, 0);
           break;
         }
